@@ -1,0 +1,17 @@
+name: FacebookLink
+main: com.makzk.cb.fblink.FacebookLink
+version: 0.0.1
+author: makzk
+
+commands:
+   facebook:
+      description: Allows to control the Facebook Link.
+      usage: /<command>
+      aliases: fb
+      permission: fblink.command
+      permission-message: You don't have <permission> permission node
+
+permissions:
+    fb.command:
+        description: Allows to use the FacebookLink controller command
+        default: op
