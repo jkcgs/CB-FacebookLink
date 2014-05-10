@@ -4,16 +4,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class FacebookLink extends JavaPlugin {
 	private static FacebookLink instance;
+	public Configuration conf;
 
 	@Override
 	public void onEnable() {
 		instance = this;
+		
+		conf = new Configuration(instance, "config.yml");
+		conf.saveDefaultConfig();
+		
 		getLogger().info("FacebookLink WIP!");
-		getServer().getPluginManager().disablePlugin(instance);
 	}
 	
 	@Override
 	public void onDisable() {
-		
+		conf.saveConfig();
 	}
 }
