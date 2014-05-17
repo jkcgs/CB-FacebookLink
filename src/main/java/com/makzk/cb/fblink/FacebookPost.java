@@ -1,32 +1,42 @@
 package com.makzk.cb.fblink;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import com.makzk.apilinks.Bitly;
+import com.makzk.apilinks.Facebook;
 
 public class FacebookPost {
 	private String content;
 	private String type;
 	private String link;
+	private String shortnedLink;
 	private Date date;
+	private Facebook fb;
+	private FacebookLink p;
+	
+	public FacebookPost() {
+		p = FacebookLink.getInstance();
+		shortnedLink = "";
+		fb = new Facebook(p.conf.string("appId"), p.conf.string("appSecret"));
+	}
 	
 	/**
-	 * Fills the post information from a Facebook Graph API URL
+	 * Fills the post information from a Facebook Graph API URL.
+	 * ALERT! Do this asynchronously with the server or it will freeze!
 	 * @param url The URL to retrieve
 	 * @return true if the content were successfully retrieved, or false in contrary case
 	 */
-	public boolean createFromURL(URL url) {
+	public boolean createFromPage() {
 		try {
-			// create JSON Object to parse OpenGraph data
-			JSONObject root = new JSONObject(new JSONTokener(url.openStream()));
-			root = root.getJSONArray("data").getJSONObject(0);
+			// TODO
+			fb.getAccessToken();
+			if(!fb.canAccessApi()) {
+				throw new Exception("Unable to access Facebook Graph API");
+			}
+			
+			JSONObject root = fb.getLastPostFromPage(p.conf.string("pageId"));
 		
 			// Check if data was retrieved correctly
 			if(root.isNull("message") || root.isNull("updated_time") || root.isNull("type")) {
@@ -39,27 +49,8 @@ public class FacebookPost {
 				
 				return true;
 			}
-		} catch (JSONException | IOException e) {
-			return false;
-		}
-	}
-	
-	/**
-	 * Retrieves the last post from a page, and fills the post information
-	 * using the Page ID and the access token from a Facebook App
-	 * @param pageId The page ID to read
-	 * @param token The access token that allows to read the content
-	 * @return true if the content were successfully retrieved, or false in contrary case
-	 */
-	public boolean createFromPage(String pageId, String token) {
-		// create the URL link to get the post
-		String fields = "message,type,updated_time";
-		String targetURL = "https://graph.facebook.com/%s/posts?fields=%s&limit=1&date_format=U&token=%s";
-		try {
-			// Create the URL format and call the another method
-			URL url = new URL(String.format(targetURL, pageId, fields, token));
-			return createFromURL(url);
-		} catch (MalformedURLException e) {
+		} catch (Exception e) {
+			p.getLogger().severe("CreateFromURL Error: " + e.getMessage());
 			return false;
 		}
 	}
@@ -104,13 +95,12 @@ public class FacebookPost {
 	 * @see Bitly 
 	 */
 	public String getBitlyLink(String token) {
-		if(!link.isEmpty()) {
-			Bitly shortner = new Bitly();
-			shortner.setAccessToken(token);
-			return shortner.canAccessApi() ? shortner.getShortenedLink(link) : "";
-		} else {
-			return "";
+		if(!link.isEmpty() && shortnedLink.isEmpty()) {
+			Bitly shortner = new Bitly(token);
+			shortnedLink = shortner.canAccessApi() ? shortner.getShortenedLink(link) : "";
 		}
+
+		return shortnedLink;
 	}
 	
 	/**

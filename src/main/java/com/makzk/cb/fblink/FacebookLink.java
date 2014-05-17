@@ -20,4 +20,8 @@ public class FacebookLink extends JavaPlugin {
 	public void onDisable() {
 		conf.saveConfig();
 	}
+	
+	public static FacebookLink getInstance() {
+		return instance;
+	}
 }

@@ -31,6 +31,20 @@
 		</dependency>
 	</dependencies>
 	
+	<scm>
+		<connection>scm:git:https://github.com/makzk/CB-FacebookLink.git</connection>
+		<developerConnection>scm:git:https://github.com/makzk/CB-FacebookLink.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/makzk/CB-ChatFilter/</url>
+	</scm>
+	
+	<distributionManagement>
+		<repository>
+			<id>ftp-repository</id>
+			<url>ftp://repo.makzk.com/cbp/maven2/</url>
+		</repository>
+	</distributionManagement>
+
 	<build>
 		<finalName>${project.artifactId}-${project.version}-r${buildNumber}</finalName>
 		<plugins>
@@ -64,23 +78,13 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			<!-- If you're not me (makzk), remove this when building! -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<executable>copy_to_dropbox.bat</executable>
-				</configuration>
-			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+		</extensions>
 	</build>
 </project>

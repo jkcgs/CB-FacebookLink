@@ -6,9 +6,9 @@ import com.makzk.json.URIData;
 
 public class Bitly {
 	private String accessToken;
-	private boolean useSSL;
+	private boolean useSSL = true;
 	
-	public void setAccessToken(String token) {
+	public Bitly(String token) {
 		accessToken = token;
 	}
 	
@@ -17,18 +17,19 @@ public class Bitly {
 	}
 	
 	public boolean canAccessApi() {
-		String urlckeck = "s/v3/shorten?access_token=%s&longUrl=http%3A%2F%2Fgoogle.com%2F";
+		String urlckeck = "%s/v3/shorten?access_token=%s&longUrl=http://www.google.com";
 		URIData json = new URIData(String.format(urlckeck, getDomain(), accessToken));
 		
-		return !json.isNull("status_code") && json.getInt("status_code") == 200;
+		return json.data.has("status_code") && json.data.getInt("status_code") == 200;
 	}
 	
 	public String getShortenedLink(String longLink) {
 		String urlEncoded = UriEncoder.encode(longLink);
 		String urlBitly = "%s/v3/shorten?access_token=%s&longUrl=%s";
 		
-		URIData json = new URIData(String.format(urlBitly, getDomain(), urlEncoded, accessToken));
+		URIData json = new URIData(String.format(urlBitly, getDomain(), accessToken, urlEncoded));
 		
-		return canAccessApi() && !json.isNull("url") ? json.getString("url") : "";
+		return canAccessApi() && json.data.getJSONObject("data").has("url") ? 
+				json.data.getJSONObject("data").getString("url") : "";
 	}
 }

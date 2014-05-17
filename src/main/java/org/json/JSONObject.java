@@ -148,7 +148,7 @@ public class JSONObject {
     /**
 * The map where the JSONObject's properties are kept.
 */
-    public Map map;
+    private Map map;
 
     /**
 * It is sometimes more convenient and less ambiguous to have a
