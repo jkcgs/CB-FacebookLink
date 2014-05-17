@@ -7,6 +7,11 @@ import org.json.JSONObject;
 import com.makzk.apilinks.Bitly;
 import com.makzk.apilinks.Facebook;
 
+/**
+ * This class has the details for a single post from a Facebook Page.
+ * 
+ * @author makzk <me@makzk.com>
+ */
 public class FacebookPost {
 	private String content;
 	private String type;
@@ -30,7 +35,6 @@ public class FacebookPost {
 	 */
 	public boolean createFromPage() {
 		try {
-			// TODO
 			fb.getAccessToken();
 			if(!fb.canAccessApi()) {
 				throw new Exception("Unable to access Facebook Graph API");
